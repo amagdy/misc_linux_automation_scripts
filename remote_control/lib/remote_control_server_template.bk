@@ -1,0 +1,19 @@
+#===================================================================================
+export DISPLAY=:0.0
+chmod +x $HOME_DIR/config
+chmod +x $HOME_DIR/lib/handle_request.sh
+chmod -R +x $HOME_DIR/commands/*
+
+# include config variables
+. $HOME_DIR/config
+
+if [ -e "$HOME_DIR/lib/input" ]; then
+	rm "$HOME_DIR/lib/input"
+fi
+mkfifo "$HOME_DIR/lib/input"
+
+# listen
+while true; do
+	nc -l $PORT < $HOME_DIR/lib/input | $HOME_DIR/lib/handle_request.sh "$HOME_DIR" > $HOME_DIR/lib/input
+	if [ $? -ne 0 ]; then break; fi
+done
