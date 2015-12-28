@@ -10,8 +10,9 @@ import urllib2
 # Change this URL to match your city make sure that the URL does NOT contain the month and year params
 URL = "http://www.islamicfinder.org/prayerPrintable.php?city2=Doha&state=01&id=719&longi=51.5333&lati=25.2867&country2=Qatar&zipcode=&today_date_flag=2015-12-28&changeTime=16&pmethod=4&HanfiShafi=1&dhuhrInterval=1&maghribInterval=1&dayLight=0&dayl=0&timez=3.00&dayLight_self_change=&prayerCustomize=&lang=&fajrTwilight=0&ishaTwilight=0&ishaInterval=0"
 
+PLAYER = "totem"
 ATHAN_DIR = "athan"
-
+CHECK_INTERVAL=40
 
 
 URL += "&month={0}&year={1}"
@@ -69,12 +70,14 @@ if __name__ == "__main__":
 		hash_day = current_month_data[time.strftime("%d")]
 		prayers = {v: k for k, v in hash_day['prayers'].items()}
 		current_time = re.sub(r'^0', '', time.strftime("%H:%M"))
+		print prayers
 		print current_time
 		prayer_name = prayers.get(current_time, "")
 		if prayer_name != "":
-			print prayer_name
 			athan_file = '{0}/{1}.mp3'.format(ATHAN_DIR, prayer_name)
+			prayer_name = prayer_name[:1].upper() + prayer_name[1:]
+			os.popen('zenity --info --text "Now is {0} Prayer"'.format(prayer_name))
 			if os.path.exists(athan_file):
-				os.popen('play {0}'.format(athan_file))
-		time.sleep(30)
+				os.popen('{0} {1}'.format(PLAYER, athan_file))
+		time.sleep(CHECK_INTERVAL)
 
